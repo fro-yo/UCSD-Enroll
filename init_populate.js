@@ -10,13 +10,15 @@ admin.initializeApp({
 var db = admin.database();
 
 var quarter = 'FA16';
-var dept = 'CSE';
+var dept = 'MATH';
 var timeout = 10000;
 var undergrad = true;   // optional boolean to select only undergrad courses (< 200)
 socsjs.searchDepartment(quarter, dept, timeout, undergrad).then(function(result) {
     var deptObj = {};
     for (var courseNum in result) {
         var course = result[courseNum];
+        console.log (course);
+        console.log (course.code);
         if (course.department !== null) {
 
             // if course not encountered
@@ -37,7 +39,9 @@ socsjs.searchDepartment(quarter, dept, timeout, undergrad).then(function(result)
         }
     }
 
-    console.log (JSON.stringify(deptObj));
+    var ref = db.ref ('/'+quarter+'/'+dept);
+    ref.set (deptObj);
+    console.log ('pushed!')
 }).catch(function(err) {
     console.log(err, 'oops!');
 });
