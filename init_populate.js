@@ -12,13 +12,11 @@ var db = admin.database();
 var quarter = 'FA16';
 var dept = 'MATH';
 var timeout = 10000;
-var undergrad = true;   // optional boolean to select only undergrad courses (< 200)
+var undergrad = true;
 socsjs.searchDepartment(quarter, dept, timeout, undergrad).then(function(result) {
     var deptObj = {};
     for (var courseNum in result) {
         var course = result[courseNum];
-        console.log (course);
-        console.log (course.code);
         if (course.department !== null) {
 
             // if course not encountered
@@ -30,18 +28,29 @@ socsjs.searchDepartment(quarter, dept, timeout, undergrad).then(function(result)
 
             for (sectionNum in course.sections) {
                 var section = course.sections[sectionNum];
-                if (section.type === 'lecture') {
+                if (section.id !== null && section.teacher !== null) {
                     section.openSeats = 'init',
                     section.waitlistSize = 'init'
-                    deptObj [course.code]['lectures'].push (section);
+
+                    // remove '.'
+                    var teacher = section.teacher.replace ('.', '');
+
+                    if (deptObj[course.code]['lectures'][teacher] === undefined) {
+                        deptObj[course.code]['lectures'][teacher] = [section];
+                    }
+                    else {
+                        deptObj [course.code]['lectures'][teacher].push (section);
+                    }
                 }
             }
         }
     }
 
     var ref = db.ref ('/'+quarter+'/'+dept);
-    ref.set (deptObj);
-    console.log ('pushed!')
+    ref.set (deptObj).then (function () {
+        console.log ('pushed!');
+        process.exit (1);
+    });
 }).catch(function(err) {
     console.log(err, 'oops!');
 });
