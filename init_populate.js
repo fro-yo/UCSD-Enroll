@@ -15,7 +15,7 @@ var departments=['AAS','AESE','AIP','ANAR','ANBI','ANES'	,'ANSC','ANTH','AUD','B
 
 for (var d in departments) {
     let dept = departments[d];
-    var timeout = 1000000;
+    var timeout = 10000000;
     var undergrad = true;
     socsjs.searchDepartment(quarter, dept, timeout, undergrad).then(function(result) {
         var deptObj = {};
@@ -50,7 +50,7 @@ for (var d in departments) {
             }
         }
 
-        var ref = db.ref ('/'+quarter+'/'+dept);
+        let ref = db.ref ('/'+quarter+'/'+dept);
         console.log ('pushing ' + quarter + ' ' + dept);
         ref.set (deptObj).then (function () {
             console.log (count + ' ' + departments.length);
