@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<<<<<<< HEAD
 
 <head>
 <!-- 	<meta charset = "utf-8">
@@ -37,3 +38,250 @@
         <script src="js/index.js"></script>
 
 </body>
+=======
+<meta charset="utf-8">
+<style>
+
+body {
+  font: 10px sans-serif;
+  background-color: black;
+  color: white;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #ccc;
+  shape-rendering: crispEdges;
+}
+
+.grid path,
+.grid line {
+  fill: none;
+  stroke: #ccc;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  display: none;
+}
+
+.line {
+  fill: none;
+  stroke-width: 2.5px;
+}
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.js"></script>
+<script src="https://www.gstatic.com/firebasejs/3.7.1/firebase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+var config = {
+    apiKey: "AIzaSyBw-w8eINyUyMNoUGMLam3IUOWbZ83bjFY",
+    authDomain: "ucsd-enroll.firebaseapp.com",
+    databaseURL: "https://ucsd-enroll.firebaseio.com/",
+    storageBucket: "ucsd-enroll.appspot.com"
+};
+
+firebase.initializeApp(config);
+var database = firebase.database()
+
+var xDays = [-35,-34,-33,-32,-31,-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70];
+
+database.ref('/FA16/CSE/30/lectures/0/').once("value").then(function(snapshot){
+    //var lopenSeats = snapshot.val().openSeats;
+    //var lseatLimit = snapspot.val().seatLimit;
+    //var lwaitlistSize = snapshot.val().waitlistSize;
+    console.log(snapshot.val().openSeats);
+    console.log(snapshot.val().seatLimit);
+    console.log(snapshot.val().waitlistSize);
+
+    var EpW = [];
+    for(var i = 0; i < 107; i++){
+        EpW.push(snapshot.val().seatLimit[i] - snapshot.val().openSeats[i] + snapshot.val().waitlistSize[i]);
+    }
+
+    var data = [ { label: "Enrollment", 
+               x: xDays, //every 2 is one week 
+               y: snapshot.val().seatLimit}, 
+             { label: "Enrolled + Waitlisted", 
+               x: xDays, //every 2 is one week 
+               y: EpW}, 
+             { label: "Open Seats", 
+               x: xDays, //every 2 is one week 
+               y: snapshot.val().openSeats}]; 
+
+
+    var xy_chart = d3_xy_chart()
+        .width(960)
+        .height(500)
+        .xlabel("Days since enrollment opened")
+        .ylabel("Students") ;
+    var svg = d3.select("body").append("svg")
+        .datum(data)
+        .call(xy_chart) ;
+
+
+});
+
+$('body').keydown(function(){
+    var data = {};
+    var svg = d3.select("body").append("svg")
+        .datum(data)
+        .call(xy_chart) ;
+})
+
+function d3_xy_chart() {
+    var width = 640,  
+        height = 480, 
+        xlabel = "X Axis Label",
+        ylabel = "Y Axis Label" ;
+    
+    function chart(selection) {
+        selection.each(function(datasets) {
+            //
+            // Create the plot. 
+            //
+            var margin = {top: 20, right: 80, bottom: 30, left: 50}, 
+                innerwidth = width - margin.left - margin.right,
+                innerheight = height - margin.top - margin.bottom ;
+            
+            var x_scale = d3.scale.linear()
+                .range([0, innerwidth])
+                .domain([ d3.min(datasets, function(d) { return d3.min(d.x); }), 
+                          d3.max(datasets, function(d) { return d3.max(d.x); }) ]) ;
+
+            var y_scale = d3.scale.linear()
+                .range([innerheight, 0])
+                .domain([ d3.min(datasets, function(d) { return d3.min(d.y); }),
+                          d3.max(datasets, function(d) { return d3.max(d.y); }) ]) ;
+
+            var color_scale = d3.scale.category10()
+                .domain(d3.range(datasets.length)) ;
+
+            var x_axis = d3.svg.axis()
+                .scale(x_scale)
+                .orient("bottom");
+
+            var y_axis = d3.svg.axis()
+                .scale(y_scale)
+                .orient("left") ;
+
+            var x_grid = d3.svg.axis()
+                .scale(x_scale)
+                .orient("bottom")
+                .tickSize(-innerheight)
+                .tickFormat("") ;
+
+            var y_grid = d3.svg.axis()
+                .scale(y_scale)
+                .orient("left") 
+                .tickSize(-innerwidth)
+                .tickFormat("") ;
+
+            var draw_line = d3.svg.line()
+                .interpolate("basis")
+                .x(function(d) { return x_scale(d[0]); })
+                .y(function(d) { return y_scale(d[1]); }) ;
+
+            var svg = d3.select(this)
+                .attr("width", width)
+                .attr("height", height)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")") ;
+            
+            svg.append("g")
+                .attr("class", "x grid")
+                .attr("transform", "translate(0," + innerheight + ")")
+                .call(x_grid) ;
+
+            svg.append("g")
+                .attr("class", "y grid")
+                .call(y_grid) ;
+
+            svg.append("g")
+                .style('fill', 'white')
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + innerheight + ")") 
+                .call(x_axis)
+                .append("text")
+                .attr("dy", "-.71em")
+                .attr("x", innerwidth)
+                .style("text-anchor", "end")
+                .text(xlabel) ;
+            
+            svg.append("g")
+                .style('fill', 'white')
+                .attr("class", "y axis")
+                .call(y_axis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", "0.71em")
+                .style("text-anchor", "end")
+                .text(ylabel) ;
+
+            var data_lines = svg.selectAll(".d3_xy_chart_line")
+                .data(datasets.map(function(d) {return d3.zip(d.x, d.y);}))
+                .enter().append("g")
+                .attr("class", "d3_xy_chart_line") ;
+            
+            data_lines.append("path")
+                .attr("class", "line")
+                .attr("d", function(d) {return draw_line(d); })
+                .attr("stroke", function(_, i) {return color_scale(i);}) ;
+            
+            data_lines.append("text")
+                .datum(function(d, i) { return {name: datasets[i].label, final: d[d.length-1]}; }) 
+                .attr("transform", function(d) { 
+                    return ( "translate(" + x_scale(d.final[0]) + "," + 
+                             y_scale(d.final[1]) + ")" ) ; })
+                .attr("x", 3)
+                .attr("dy", ".35em")
+                .attr("fill", function(_, i) { return color_scale(i); })
+                .text(function(d) { return d.name; }) ;
+
+        }) ;
+    }
+
+    chart.width = function(value) {
+        if (!arguments.length) return width;
+        width = value;
+        return chart;
+    };
+
+    chart.height = function(value) {
+        if (!arguments.length) return height;
+        height = value;
+        return chart;
+    };
+
+    chart.xlabel = function(value) {
+        if(!arguments.length) return xlabel ;
+        xlabel = value ;
+        return chart ;
+    } ;
+
+    chart.ylabel = function(value) {
+        if(!arguments.length) return ylabel ;
+        ylabel = value ;
+        return chart ;
+    } ;
+
+    return chart;
+}
+
+
+
+</script>
+
+
+
+
+
+
+
+
+
+>>>>>>> 7f5d437a2436844026c6688d4be569ed052148c0
