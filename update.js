@@ -31,7 +31,7 @@ for (var d in departments) {
 
         var today = new Date();
         var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        console.log (dept);
+        //console.log (dept);
 
         //console.log (JSON.stringify (oldObj, null, 4));
         socsjs.searchDepartment(quarter, dept, timeout, undergrad).then(function(result) {
@@ -40,6 +40,7 @@ for (var d in departments) {
                 let course = result[courseNum];
 
                 if (course.department !== null) {
+
 
                     // if course not encountered
                     if (oldObj[course.code] === undefined ) {
