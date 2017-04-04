@@ -4,19 +4,21 @@
 
 body {
   font: 10px sans-serif;
+  background-color: black;
+  color: white;
 }
 
 .axis path,
 .axis line {
   fill: none;
-  stroke: #000;
+  stroke: #ccc;
   shape-rendering: crispEdges;
 }
 
 .grid path,
 .grid line {
   fill: none;
-  stroke: rgba(0, 0, 0, 0.25);
+  stroke: #ccc;
   shape-rendering: crispEdges;
 }
 
@@ -33,6 +35,7 @@ body {
 <body>
 <script src="http://d3js.org/d3.v3.js"></script>
 <script src="https://www.gstatic.com/firebasejs/3.7.1/firebase.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script>
 var config = {
     apiKey: "AIzaSyBw-w8eINyUyMNoUGMLam3IUOWbZ83bjFY",
@@ -44,35 +47,50 @@ var config = {
 firebase.initializeApp(config);
 var database = firebase.database()
 
-database.ref('/').set({
-    test: "test"
-});
-
 var xDays = [-35,-34,-33,-32,-31,-30,-29,-28,-27,-26,-25,-24,-23,-22,-21,-20,-19,-18,-17,-16,-15,-14,-13,-12,-11,-10,-9,-8,-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70];
 
-var sampEnr = [];
-var sampEpW = [];
-var sampOS = [];
+database.ref('/FA16/CSE/30/lectures/0/').once("value").then(function(snapshot){
+    //var lopenSeats = snapshot.val().openSeats;
+    //var lseatLimit = snapspot.val().seatLimit;
+    //var lwaitlistSize = snapshot.val().waitlistSize;
+    console.log(snapshot.val().openSeats);
+    console.log(snapshot.val().seatLimit);
+    console.log(snapshot.val().waitlistSize);
 
-for(var i = 0; i < )
+    var EpW = [];
+    for(var i = 0; i < 107; i++){
+        EpW.push(snapshot.val().seatLimit[i] - snapshot.val().openSeats[i] + snapshot.val().waitlistSize[i]);
+    }
 
-var data = [ { label: "Enrollment", 
+    var data = [ { label: "Enrollment", 
                x: xDays, //every 2 is one week 
-               y: [200, 200, 200, 200, 200, 200, 200, 200, 200] }, 
+               y: snapshot.val().seatLimit}, 
              { label: "Enrolled + Waitlisted", 
                x: xDays, //every 2 is one week 
-               y: [0, 150, 240, 230, 220, 210, 190, 185, 180] }, 
+               y: EpW}, 
              { label: "Open Seats", 
                x: xDays, //every 2 is one week 
-               y: [0, 0, 0, 0, 0, 0, 10, 15, 20] }]; 
-var xy_chart = d3_xy_chart()
-    .width(960)
-    .height(500)
-    .xlabel("Days since enrollment opened")
-    .ylabel("Students") ;
-var svg = d3.select("body").append("svg")
-    .datum(data)
-    .call(xy_chart) ;
+               y: snapshot.val().openSeats}]; 
+
+
+    var xy_chart = d3_xy_chart()
+        .width(960)
+        .height(500)
+        .xlabel("Days since enrollment opened")
+        .ylabel("Students") ;
+    var svg = d3.select("body").append("svg")
+        .datum(data)
+        .call(xy_chart) ;
+
+
+});
+
+$('body').keydown(function(){
+    var data = {};
+    var svg = d3.select("body").append("svg")
+        .datum(data)
+        .call(xy_chart) ;
+})
 
 function d3_xy_chart() {
     var width = 640,  
@@ -93,7 +111,7 @@ function d3_xy_chart() {
                 .range([0, innerwidth])
                 .domain([ d3.min(datasets, function(d) { return d3.min(d.x); }), 
                           d3.max(datasets, function(d) { return d3.max(d.x); }) ]) ;
-            
+
             var y_scale = d3.scale.linear()
                 .range([innerheight, 0])
                 .domain([ d3.min(datasets, function(d) { return d3.min(d.y); }),
@@ -104,7 +122,7 @@ function d3_xy_chart() {
 
             var x_axis = d3.svg.axis()
                 .scale(x_scale)
-                .orient("bottom") ;
+                .orient("bottom");
 
             var y_axis = d3.svg.axis()
                 .scale(y_scale)
@@ -143,6 +161,7 @@ function d3_xy_chart() {
                 .call(y_grid) ;
 
             svg.append("g")
+                .style('fill', 'white')
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + innerheight + ")") 
                 .call(x_axis)
@@ -153,6 +172,7 @@ function d3_xy_chart() {
                 .text(xlabel) ;
             
             svg.append("g")
+                .style('fill', 'white')
                 .attr("class", "y axis")
                 .call(y_axis)
                 .append("text")
@@ -212,4 +232,15 @@ function d3_xy_chart() {
     return chart;
 }
 
+
+
 </script>
+
+
+
+
+
+
+
+
+
