@@ -10,10 +10,14 @@ admin.initializeApp({
 
 var db = admin.database();
 var quarter = 'SP17';
-var timeout = 1000000;
+var timeout = 100000000;
 var undergrad = true;
+var count = 0;
+var failed = 0;
 
 var departments=['AAS','AESE','AIP','ANAR','ANBI','ANES'	,'ANSC','ANTH','AUD','BENG','BGGN'  ,'BGJC'	,'BGRD'	,'BGSE'	,'BIBC'	,'BICD','BIEB'	,'BILD'	,'BIMM'	,'BIOM'	,'BIPN','BISP'	,'BNFO'	,'CAT','CENG','CGS','CHEM','CHIN','CLAS'	,'CLIN'	,'CLRE'	,'CLSS'	,'CMM','COGN','COGR'	,'COGS'	,'COMM'	,'CONT'	,'COSF'	,'CSE','DERM'	,'DOC','DSE','DSGN'	,'EAP','ECE','ECON','EDS','ELWR'	,'EMED'	,'ENG','ENVR'	,'ERC','ESYS'	,'ETHN'	,'EXPR'	,'FILM'	,'FMPH'	,'FPM','FPMU'	,'GLBH'	,'GMST'	,'GPCO','GPEC','GPGN','GPIM','GPLA'	,'GPPA'	,'GPPS'	,'HDP','HIAF','HIEA'	,'HIEU'	,'HIGR'	,'HILA'	,'HILD'	,'HINE'	,'HISC'	,'HITO'	,'HIUS'	,'HLAW'	,'HMNR'	,'HUM','ICAM'	,'ICEP'	,'INTL'	,'IRCO'	,'IRGN'	,'IRLA'	,'JAPN'	,'JUDA'	,'LATI'	,'LAWS'	,'LHCO','LIAB','LIDS','LIEO','LIFR','LIGM','LIGN','LIHI','LIHL','LIIT','LIPO','LISL','LISP','LTAF','LTAM','LTCH','LTCO','LTCS','LTEA','LTEN','LTEU','LTFR','LTGK','LTGM','LTHE','LTIT','LTKO','LTLA','LTPR','LTRU','LTSP','LTTH','LTWL','LTWR','MAE','MATH','MATS','MBC','MCWP','MDE','MED','MGT','MGTA','MGTF'	,'MMW','MSED'	,'MSP','MUIR'	,'MUS','NANO'	,'NEU','OPTH'	,'ORTH'	,'PATH'	,'PEDS'	,'PHAR'	,'PHIL'	,'PHYS'	,'POLI'	,'PSY','PSYC'	,'RAD','RELI'	,'REV','RMAS'	,'RMED'	,'SDCC'	,'SE','SIO','SIOB','SIOC','SIOG','SOCD'	,'SOCE'	,'SOCG'	,'SOCI'	,'SOCL'	,'SOMC'	,'SOMI','SPPS','SURG','SXTH','TDAC','TDCH','TDDE','TDDR','TDGE'	,'TDGR'	,'TDHD'	,'TDHT'	,'TDMV'	,'TDPF'	,'TDPR'	,'TDPW'	,'TDTR'	,'TMC','TWS','USP','VIS','WARR'	,'WCWP','WES']
+
+var copy=['AAS','AESE','AIP','ANAR','ANBI','ANES'	,'ANSC','ANTH','AUD','BENG','BGGN'  ,'BGJC'	,'BGRD'	,'BGSE'	,'BIBC'	,'BICD','BIEB'	,'BILD'	,'BIMM'	,'BIOM'	,'BIPN','BISP'	,'BNFO'	,'CAT','CENG','CGS','CHEM','CHIN','CLAS'	,'CLIN'	,'CLRE'	,'CLSS'	,'CMM','COGN','COGR'	,'COGS'	,'COMM'	,'CONT'	,'COSF'	,'CSE','DERM'	,'DOC','DSE','DSGN'	,'EAP','ECE','ECON','EDS','ELWR'	,'EMED'	,'ENG','ENVR'	,'ERC','ESYS'	,'ETHN'	,'EXPR'	,'FILM'	,'FMPH'	,'FPM','FPMU'	,'GLBH'	,'GMST'	,'GPCO','GPEC','GPGN','GPIM','GPLA'	,'GPPA'	,'GPPS'	,'HDP','HIAF','HIEA'	,'HIEU'	,'HIGR'	,'HILA'	,'HILD'	,'HINE'	,'HISC'	,'HITO'	,'HIUS'	,'HLAW'	,'HMNR'	,'HUM','ICAM'	,'ICEP'	,'INTL'	,'IRCO'	,'IRGN'	,'IRLA'	,'JAPN'	,'JUDA'	,'LATI'	,'LAWS'	,'LHCO','LIAB','LIDS','LIEO','LIFR','LIGM','LIGN','LIHI','LIHL','LIIT','LIPO','LISL','LISP','LTAF','LTAM','LTCH','LTCO','LTCS','LTEA','LTEN','LTEU','LTFR','LTGK','LTGM','LTHE','LTIT','LTKO','LTLA','LTPR','LTRU','LTSP','LTTH','LTWL','LTWR','MAE','MATH','MATS','MBC','MCWP','MDE','MED','MGT','MGTA','MGTF'	,'MMW','MSED'	,'MSP','MUIR'	,'MUS','NANO'	,'NEU','OPTH'	,'ORTH'	,'PATH'	,'PEDS'	,'PHAR'	,'PHIL'	,'PHYS'	,'POLI'	,'PSY','PSYC'	,'RAD','RELI'	,'REV','RMAS'	,'RMED'	,'SDCC'	,'SE','SIO','SIOB','SIOC','SIOG','SOCD'	,'SOCE'	,'SOCG'	,'SOCI'	,'SOCL'	,'SOMC'	,'SOMI','SPPS','SURG','SXTH','TDAC','TDCH','TDDE','TDDR','TDGE'	,'TDGR'	,'TDHD'	,'TDHT'	,'TDMV'	,'TDPF'	,'TDPR'	,'TDPW'	,'TDTR'	,'TMC','TWS','USP','VIS','WARR'	,'WCWP','WES']
 
 for (var d in departments) {
 
@@ -30,7 +34,7 @@ for (var d in departments) {
         }
 
         var today = new Date();
-        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate());
         //console.log (dept);
 
         //console.log (JSON.stringify (oldObj, null, 4));
@@ -108,12 +112,35 @@ for (var d in departments) {
 
             }
 
+            count++;
+            console.log ('Update '+ dept + ' '+ count+'/'+departments.length);
+            /*
+            let index = copy.indexOf(dept);
+            copy.splice (index, 1);
+
+            if (count > departments.length - 5) {
+                console.log (copy);
+            }
+
+            */
+
             ref.set (oldObj).then (function () {
                 console.log ('Updated ' + dept + ' ' + quarter);
+                if (count == departments.length) {
+                    console.log ("Completed. Success: "+departments.length - failed+ " Failed: "+failed);
+                    process.exit(0);
+                }
             });
 
         }).catch(function(err) {
             console.log(err, 'oops!');
+            count++;
+            failed++;
+
+            /*
+            let index = copy.indexOf(dept);
+            copy.splice (index, 1);
+            */
         });
     });
 
